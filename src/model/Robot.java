@@ -1,55 +1,44 @@
 package model;
 
+import control.Move;
 import javafx.util.Pair;
 
 public class Robot {
-    private Pair<Byte, Byte> cords;
-    private Character orientation;
+    private RobotPosition position;
     private Boolean lost = false;
     private char[] commands;
+    private Move move;
 
-    public Robot(Byte x, Byte y, Character orientation, char[] commands) {
-        this.cords = new Pair<>(x, y);
-        this.orientation = orientation;
+    public Robot(Byte x, Byte y, Character orientation, char[] commands, Move move) {
+        this.position = new RobotPosition()
+                .cords(new Pair<>(x, y))
+                .orientation(orientation);
         this.commands = commands;
+        this.move = move;
     }
 
-    public String getPosition() {
-        return cords.getKey() + " " + cords.getValue() + " " + orientation + (lost ? " LOST" : "");
-    }
-
-    public char[] getCommands() {
-        return commands;
-    }
-
-    public Pair<Byte, Byte> getCords() {
-        return cords;
-    }
-
-    public Character getOrientation() {
-        return orientation;
-    }
-
-    public Boolean getLost() {
-        return lost;
-    }
-
-    public void setCords(Pair<Byte, Byte> cords) {
-        if (lost) {
-            return;
+    /**
+     * Execute all commands
+     *
+     * @return String - position after work
+     */
+    public String move() {
+        for (Character command : commands) {
+            if (lost = move.move(command, position)) {
+                break;
+            }
         }
-        this.cords = cords;
+
+        return position.toString() + (lost ? " LOST" : "");
     }
 
-    public void setOrientation(Character orientation) {
-        if (lost) {
-            return;
-        }
-        this.orientation = orientation;
+    /**
+     * Check current robot is lost and have the same position
+     *
+     * @param position - other robot position
+     * @return boolean - return true id current robot is lost and have the same position
+     */
+    public boolean lostAndPosition(RobotPosition position) {
+        return lost && this.position.equals(position);
     }
-
-    public void setLost(Boolean lost) {
-        this.lost = lost;
-    }
-
 }

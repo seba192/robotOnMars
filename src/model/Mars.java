@@ -1,39 +1,47 @@
 package model;
 
-import control.Move;
 import javafx.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mars {
+class Mars {
     private Pair<Byte, Byte> topRightCords;
     private List<Robot> robotsOnMars = new ArrayList<>();
-    private Move move;
 
-    public Mars(Byte x, Byte y, Move move) {
+    Mars(Byte x, Byte y) {
         this.topRightCords = new Pair<>(x, y);
-        this.move = move;
-        this.move.setMars(this);
     }
 
-    public boolean robotTryAndLose(Robot robot) {
-        long count = robotsOnMars.stream().filter(robotOnMars ->
-                robotOnMars.getLost() &&
-                        robotOnMars.getOrientation().equals(robot.getOrientation()) &&
-                        robotOnMars.getCords().getKey().equals(robot.getCords().getKey()) &&
-                        robotOnMars.getCords().getValue().equals(robot.getCords().getValue())
-        ).count();
-        return count == 0;
+    /**
+     * Check position with other robots
+     *
+     * @param position - current robot position
+     * @return boolean - if current robot have the same position as one of lost robots
+     */
+    boolean otherRobotLost(RobotPosition position) {
+        long count = robotsOnMars.stream().filter(robotOnMars -> robotOnMars.lostAndPosition(position)).count();
+        return count > 0;
     }
 
-    public boolean positionOffBoard(Pair<Byte, Byte> cord) {
-        return cord.getKey() > topRightCords.getKey() || cord.getKey() < 0 ||
-                cord.getValue() > topRightCords.getValue() || cord.getValue() < 0;
+    /**
+     * Check position on the board
+     *
+     * @param position - current robot position
+     * @return boolean - return true if position is off of board
+     */
+    boolean positionOffBoard(RobotPosition position) {
+        return position.getCords().getKey() > topRightCords.getKey() || position.getCords().getKey() < 0 ||
+                position.getCords().getValue() > topRightCords.getValue() || position.getCords().getValue() < 0;
     }
 
-    public void moveRobot(Robot robot) {
-        move.move(robot);
-        robotsOnMars.add(robot);
+    /**
+     * Adding robot to list
+     *
+     * @param robot - Robot to add to list
+     */
+    void addRobot(Robot robot) {
+        this.robotsOnMars.add(robot);
     }
+
 }

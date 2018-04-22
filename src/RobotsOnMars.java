@@ -1,6 +1,6 @@
 import control.DefaultMove;
-import model.Mars;
 import model.Robot;
+import model.SingletonMars;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,8 +14,7 @@ public class RobotsOnMars {
         try {
             //TODO Validate input
             String[] map = reader.readLine().split(" ");
-            Mars mars = new Mars(Byte.valueOf(map[0]), Byte.valueOf(map[1]), new DefaultMove());
-
+            SingletonMars.getInstance(Byte.valueOf(map[0]), Byte.valueOf(map[1]));
             while (true) {
                 String[] robotPosition = reader.readLine().split(" ");
                 char[] robotCommands = reader.readLine().toCharArray();
@@ -24,11 +23,10 @@ public class RobotsOnMars {
                         Byte.valueOf(robotPosition[0]),
                         Byte.valueOf(robotPosition[1]),
                         robotPosition[2].charAt(0),
-                        robotCommands);
-
-                mars.moveRobot(robot);
-                System.out.println(robot.getPosition());
-
+                        robotCommands,
+                        new DefaultMove());
+                System.out.println(robot.move());
+                SingletonMars.addRobotToMars(robot);
                 //TODO Brake loop
             }
 

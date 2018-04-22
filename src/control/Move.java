@@ -1,20 +1,16 @@
 package control;
 
-import model.Mars;
-import model.Robot;
+import model.RobotPosition;
 
-public abstract class Move {
-    protected Mars mars;
+public interface Move {
 
-    public void setMars(Mars mars) {
-        this.mars = mars;
-    }
+    /**
+     * Method change RobotPosition
+     *
+     * @param command  - current robot command
+     * @param position - current robot position
+     * @return boolean  - return false if position is out of board and true is position is on board
+     */
+    boolean move(Character command, RobotPosition position);
 
-    public abstract void move(Robot robot);
-
-    protected abstract void goLeft(Robot robot);
-
-    protected abstract void goRight(Robot robot);
-
-    protected abstract void goForward(Robot robot);
 }

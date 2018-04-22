@@ -1,34 +1,52 @@
 package control;
 
 import javafx.util.Pair;
-import model.Robot;
+import model.RobotPosition;
+import model.SingletonMars;
 
-public class DefaultMove extends Move {
+public class DefaultMove implements Move {
 
-    public void move(Robot robot) {
-        for (Character command : robot.getCommands()) {
-            if (robot.getLost()) {
+    @Override
+    public boolean move(Character command, RobotPosition position) {
+        RobotPosition newPosition = null;
+        switch (command) {
+            case 'F':
+                newPosition = goForward(position);
                 break;
-            }
-            switch (command) {
-                case 'F':
-                    goForward(robot);
-                    break;
-                case 'L':
-                    goLeft(robot);
-                    break;
-                case 'R':
-                    goRight(robot);
-                    break;
-            }
+            case 'L':
+                newPosition = goLeft(position);
+                break;
+            case 'R':
+                newPosition = goRight(position);
+                break;
         }
+
+        if (SingletonMars.otherRobotLost(position) || newPosition == null) {
+            newPosition = position;
+        }
+
+        if (SingletonMars.positionOffBoard(newPosition)) {
+            return true;
+        }
+
+        position
+                .cords(newPosition.getCords())
+                .orientation(newPosition.getOrientation());
+
+        return false;
     }
 
-    protected void goForward(Robot robot) {
-        byte x = robot.getCords().getKey();
-        byte y = robot.getCords().getValue();
+    /**
+     * Method moves the robot forward
+     *
+     * @param position - current position
+     * @return RobotPosition - return new roboto position
+     */
+    private RobotPosition goForward(RobotPosition position) {
+        byte x = position.getCords().getKey();
+        byte y = position.getCords().getValue();
 
-        switch (robot.getOrientation()) {
+        switch (position.getOrientation()) {
             case 'N':
                 y++;
                 break;
@@ -42,45 +60,55 @@ public class DefaultMove extends Move {
                 x++;
                 break;
         }
-        Pair<Byte, Byte> newPosition = new Pair<>(x, y);
-
-        if (mars.robotTryAndLose(robot)) {
-            robot.setLost(mars.positionOffBoard(newPosition));
-            robot.setCords(newPosition);
-        }
+        return new RobotPosition().cords(new Pair<>(x, y)).orientation(position.getOrientation());
     }
 
-    protected void goLeft(Robot robot) {
-        switch (robot.getOrientation()) {
+    /**
+     * Method moves the robot left
+     *
+     * @param position - current position
+     * @return RobotPosition - return new roboto position
+     */
+    private RobotPosition goLeft(RobotPosition position) {
+        switch (position.getOrientation()) {
             case 'N':
-                robot.setOrientation('W');
+                position.setOrientation('W');
                 break;
             case 'S':
-                robot.setOrientation('E');
+                position.setOrientation('E');
                 break;
             case 'W':
-                robot.setOrientation('S');
+                position.setOrientation('S');
                 break;
             case 'E':
-                robot.setOrientation('N');
+                position.setOrientation('N');
                 break;
         }
+        return position;
     }
 
-    protected void goRight(Robot robot) {
-        switch (robot.getOrientation()) {
+    /**
+     * Method moves the robot right
+     *
+     * @param position - current position
+     * @return RobotPosition - return new roboto position
+     */
+    private RobotPosition goRight(RobotPosition position) {
+        switch (position.getOrientation()) {
             case 'N':
-                robot.setOrientation('E');
+                position.setOrientation('E');
                 break;
             case 'S':
-                robot.setOrientation('W');
+                position.setOrientation('W');
                 break;
             case 'W':
-                robot.setOrientation('N');
+                position.setOrientation('N');
                 break;
             case 'E':
-                robot.setOrientation('S');
+                position.setOrientation('S');
                 break;
         }
+        return position;
     }
+
 }
